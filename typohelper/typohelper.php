@@ -50,20 +50,20 @@ function typo_restore_tags($s)
  */
 function typo_process($s)
 {
-	// убиваем табуляцию
+	// Убиваем табуляцию
 	$s = str_replace("\t", '', $s);
 	
- 	// убиваем повторяющиеся пробелы
+	// Убиваем повторяющиеся пробелы
 	$s = preg_replace('% +%', ' ', $s);
 
 	if (defined('WP_TYPOHELPER_DUMMY') && WP_TYPOHELPER_DUMMY) {
 		$s = typo_process_lite($s);
 	}
 	
- 	// исправляем неразрывные пробелы
+	// Исправляем неразрывные пробелы
 	$s = str_replace("\xA9", '&nbsp;', $s);
 	
-	// сохраняем теги
+	// Сохраняем теги
 	$s = preg_replace_callback('%(<[^>]*>)%ums', 'typo_backup_tags', $s);
 
 	$search  = array (
@@ -89,10 +89,10 @@ function typo_process($s)
 	// $s = preg_replace( '%(?<![а-яёА-ЯЁ])([гГ]|[гГ]р|[тТ]ов)\. ([А-ЯЁ])%u', '\\1.&nbsp;\\2', $s );
 	
 	// Инициалы
-	$s = preg_replace( '%(?<![а-яёА-ЯЁ])((?:[А-ЯЁ]\. ){1,2}[А-ЯЁ][-а-яё]+)%u', '<span class="nobr">\\1</span>', $s );
+	$s = preg_replace( '%(?<![а-яёА-ЯЁ])((?:[А-ЯЁ]\. ){1,2}[А-ЯЁ][-а-яё]+)%u', '<nobr>\\1</nobr>', $s );
 	
 	// Слова через дефис
-	$s = preg_replace( '%(?<![а-яё])((?:[а-яё]{1,2}(?:\-[а-яё]+))|(?:[а-яё]+(?:\-[а-яё]{1,2})))(?![а-яё])%ui', '<span class="nobr">\\1</span>', $s );
+	$s = preg_replace( '%(?<![а-яё])((?:[а-яё]{1,2}(?:\-[а-яё]+))|(?:[а-яё]+(?:\-[а-яё]{1,2})))(?![а-яё])%ui', '<nobr>\\1</nobr>', $s );
 	
 	// Частицы
 	$s = preg_replace( '% (ж|бы|б|же|ли|ль|либо|или)(?![а-яё])%ui', '&nbsp;\\1', $s );
@@ -120,10 +120,10 @@ function typo_lite($s)
 	// Убиваем табуляцию
 	$s = str_replace("\t", '', $s);
 	
- 	// Убиваем повторяющиеся пробелы
+	// Убиваем повторяющиеся пробелы
 	$s = preg_replace('% +%', ' ', $s);
 	
- 	// Сохраняем теги
+	// Сохраняем теги
 	$s = preg_replace_callback('%(<[^>]*>)%ums', 'typo_backup_tags', $s);
 
 	$s = typo_process_lite($s);
@@ -157,8 +157,8 @@ function typo_process_lite($s)
 	$s = str_replace('...', '…', $s);
 
 	// Копирайт
-	$s = str_replace("(C)", '©', $s);	
-	$s = str_replace("(c)", '©', $s);
+	$s = str_replace('(C)', '©', $s);
+	$s = str_replace('(c)', '©', $s);
 	
 	return $s;
 }
