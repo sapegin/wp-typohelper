@@ -1,18 +1,14 @@
 <?php
 /*
 Plugin Name: Typohelper
-Description: Русская типографика. В основном расставляет неразрывные пробелы. Тире и кавычки уже должны стоять.
+Description: Обогащение русской типографики.
 Author: Artem Sapegin
 Author URI: http://sapegin.ru/
 Plugin URI: http://sapegin.ru/wordpress
 Version: 0.4
 */
 
-/*
-define('WP_TYPOHELPER_DUMMY', true);
-*/
-
-// отключаем встроенный типографер
+// Отключаем встроенный типографер
 remove_filter('category_description', 'wptexturize');
 remove_filter('list_cats', 'wptexturize');
 remove_filter('comment_author', 'wptexturize');
@@ -23,7 +19,7 @@ remove_filter('the_content', 'wptexturize');
 remove_filter('the_excerpt', 'wptexturize');
 remove_filter('the_content_rss', 'wptexturize');
 
-// переопределяем фильтры с приоритетом 10 (как и Texturize).
+// Переопределяем фильтры с приоритетом 10 (как и Texturize)
 add_filter('category_description', 'typo_lite', 10);
 add_filter('list_cats', 'typo_lite', 10);
 add_filter('comment_author', 'typo_lite', 10);
@@ -40,7 +36,7 @@ function typo_backup_tags($s)
 {
 	global $typo_tags;
 	$typo_tags[] = $s[1];
-	return "<≈>";
+	return '<≈>';
 }
 
 function typo_restore_tags($s)
@@ -50,7 +46,7 @@ function typo_restore_tags($s)
 }
 
 /*
- * Обогащение типографики. При условии, что кавычки, тире и прочие знаки уже стоят.
+ * Обогащение типографики. Кавычки, тире и прочие знаки уже должны быть расставлены.
  */
 function typo_process($s)
 {
@@ -71,9 +67,9 @@ function typo_process($s)
 	$s = preg_replace_callback('%(<[^>]*>)%ums', 'typo_backup_tags', $s);
 
 	$search  = array (
-		'№ ',			// номер
-		'§ ',			// параграф
-		' —',			// тире
+		'№ ',			// Номер
+		'§ ',			// Параграф
+		' —',			// Тире
 		'и т. д.',
 		'и т. п.',
 	);
@@ -86,77 +82,81 @@ function typo_process($s)
 	);
 	$s = str_replace( $search, $replace, $s );
 
-	// год
+	// Год
 	$s = preg_replace( '%(?<![0-9])([0-9]{4}) (г\.)%ui', '\\1&nbsp;\\2', $s );
 	
-	// имена собственные
+	// Имена собственные
 	// $s = preg_replace( '%(?<![а-яёА-ЯЁ])([гГ]|[гГ]р|[тТ]ов)\. ([А-ЯЁ])%u', '\\1.&nbsp;\\2', $s );
 	
-	// инициалы
+	// Инициалы
 	$s = preg_replace( '%(?<![а-яёА-ЯЁ])((?:[А-ЯЁ]\. ){1,2}[А-ЯЁ][-а-яё]+)%u', '<span class="nobr">\\1</span>', $s );
 	
-	// слова через дефис
+	// Слова через дефис
 	$s = preg_replace( '%(?<![а-яё])((?:[а-яё]{1,2}(?:\-[а-яё]+))|(?:[а-яё]+(?:\-[а-яё]{1,2})))(?![а-яё])%ui', '<span class="nobr">\\1</span>', $s );
 	
-	// частицы
+	// Частицы
 	$s = preg_replace( '% (ж|бы|б|же|ли|ль|либо|или)(?![а-яё])%ui', '&nbsp;\\1', $s );
 	
-	// предлоги и союзы
+	// Предлоги и союзы
 	$s = preg_replace( '%(?<![а-яё])(а|в|во|вне|и|или|к|о|с|у|о|со|об|обо|от|ото|то|на|не|ни|но|из|изо|за|уж|на|по|под|подо|пред|предо|про|над|надо|как|без|безо|что|да|для|до|там|ещё|их|или|ко|меж|между|перед|передо|около|через|сквозь|для|при|я)\s%ui', '\\1&nbsp;', $s );
 
-	// валюты
+	// Валюты
 	$s = preg_replace( '%(\d) (\$|р\.|руб\.)%ui', '\\1&nbsp;\\2', $s );
 	
-	// даты
+	// Даты
 	$s = preg_replace( '%(\d) (января|февраля|марта|апреля|мая|июня|июля|августа|сентября|ноября|декабря)%ui', '\\1&nbsp;\\2', $s );
 	
-	// восстанавливаем теги
+	// Восстанавливаем теги
 	$s = preg_replace_callback("/<≈>/u", 'typo_restore_tags', $s);
 
-	return trim( $s );
+	return trim($s);
 }
 
 /*
- * Типографика в стиле Word'а. Для комментариев и прочего неконтролируемого текста.
+ * Типографика в стиле Ворда. Для комментариев и прочего неконтролируемого текста.
  */
-function typo_lite( $s )
+function typo_lite($s)
 {
-	// убиваем табуляцию
+	// Убиваем табуляцию
 	$s = str_replace("\t", '', $s);
 	
- 	// убиваем повторяющиеся пробелы
+ 	// Убиваем повторяющиеся пробелы
 	$s = preg_replace('% +%', ' ', $s);
 	
- 	// сохраняем теги
+ 	// Сохраняем теги
 	$s = preg_replace_callback('%(<[^>]*>)%ums', 'typo_backup_tags', $s);
 
 	$s = typo_process_lite($s);
 	
-	// исправляем неразрывные пробелы
+	// Исправляем неразрывные пробелы
 	$s = str_replace("\xA9", '&nbsp;', $s);	
 
-	// восстанавливаем теги
+	// Восстанавливаем теги
 	$s = preg_replace_callback("/<≈>/u", 'typo_restore_tags', $s);
 	
 	return $s;
 }
 
-function typo_process_lite($s) {
-	// кавычки
-	$s = preg_replace( '%"([а-яёa-z<])%ui', '«\\1', $s );
-	$s = preg_replace( '%([а-яёa-z>])"%ui', '\\1»', $s );
+/*
+ * Типографика в стиле Ворда: обработка
+ */
+function typo_process_lite($s)
+{
+	// Кавычки
+	$s = preg_replace('%"([а-яёa-z<])%ui', '«\\1', $s);
+	$s = preg_replace('%([а-яёa-z>])"%ui', '\\1»', $s);
 	
-	// тире
+	// Тире
 	$s = str_replace('--', '—', $s);
 	$s = preg_replace('%(^|[> \xA0])-|—($| )%u', '\\1—\\2', $s);
 	
-	// апостроф
+	// Апостроф
 	$s = str_replace("'", '’', $s);
 
-	// многоточие
-	$s = str_replace("...", '…', $s);
+	// Многоточие
+	$s = str_replace('...', '…', $s);
 
-	// копирайт
+	// Копирайт
 	$s = str_replace("(C)", '©', $s);	
 	$s = str_replace("(c)", '©', $s);
 	

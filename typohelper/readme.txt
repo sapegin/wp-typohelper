@@ -6,7 +6,7 @@ Tested up to: 3.5
 Stable tag: 0.4
 License: MIT
 
-Обогащения русской типографики.
+Обогащение русской типографики.
 
 == Description ==
 
