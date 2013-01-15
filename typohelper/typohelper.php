@@ -28,7 +28,7 @@ add_filter('single_post_title', 'typo_process', 10);
 add_filter('the_title', 'typo_process', 10);
 add_filter('the_content', 'typo_process', 10);
 add_filter('the_excerpt', 'typo_process', 10);
-add_filter( 'the_content_rss', 'typo_process' );
+add_filter('the_content_rss', 'typo_process');
 
 $typo_tags = array ();
 
@@ -56,15 +56,15 @@ function typo_process($s)
 	// Убиваем повторяющиеся пробелы
 	$s = preg_replace('% +%', ' ', $s);
 
-	if (defined('WP_TYPOHELPER_DUMMY') && WP_TYPOHELPER_DUMMY) {
-		$s = typo_process_lite($s);
-	}
-	
 	// Исправляем неразрывные пробелы
 	$s = str_replace("\xA9", '&nbsp;', $s);
 	
 	// Сохраняем теги
 	$s = preg_replace_callback('%(<[^>]*>)%ums', 'typo_backup_tags', $s);
+
+	if (defined('WP_TYPOHELPER_DUMMY') && WP_TYPOHELPER_DUMMY) {
+		$s = typo_process_lite($s);
+	}
 
 	$search  = array (
 		'№ ',			// Номер
