@@ -108,6 +108,9 @@ function typo_process($s)
 	
 	// Восстанавливаем теги
 	$s = preg_replace_callback("/<≈>/u", 'typo_restore_tags', $s);
+	
+	// Последнее слово в абзаце
+	$s = preg_replace('%\s([а-яё]+[.!?\)]</p>)%ui', '&nbsp;\\1', $s);
 
 	return trim($s);
 }
